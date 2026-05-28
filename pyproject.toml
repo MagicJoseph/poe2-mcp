@@ -99,7 +99,12 @@ where = ["."]
 include = ["src*"]
 
 [tool.setuptools.package-data]
-src = ["../data/*.json", "../config.yaml"]
+src = [
+    "../data/*.json",
+    "../data/complete_models/*.json",
+    "../data/pob2/*.json",
+    "../config.yaml",
+]
 
 [tool.black]
 line-length = 100
