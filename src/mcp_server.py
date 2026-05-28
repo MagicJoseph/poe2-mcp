@@ -3194,17 +3194,9 @@ Consider:
                     text="Error: spell_name is required"
                 )]
 
-            # Load from pob_complete_skills.json (has full per-level stats, statSets, constantStats)
-            pob_skills_file = Path(__file__).parent.parent / 'data' / 'pob_complete_skills.json'
-
-            if not pob_skills_file.exists():
-                return [types.TextContent(
-                    type="text",
-                    text="Error: pob_complete_skills.json not found"
-                )]
-
-            with open(pob_skills_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+            # Load via the unified skill_data_loader (PoB2 → complete_models fallback chain).
+            from src.data.skill_data_loader import load_active_skills
+            data = load_active_skills()
 
             # Search for spell by name (case-insensitive) or ID
             spell_data = None
@@ -3321,7 +3313,8 @@ Consider:
                         response += f"  - {stat_id}: {value} per 1% quality\n"
                 response += "\n"
 
-            response += f"**Data Source**: pob_complete_skills.json (Path of Building, {data.get('metadata', {}).get('extraction_date', 'Unknown date')})\n"
+            meta = data.get('metadata', {})
+            response += f"**Data Source**: {meta.get('source', 'unknown')} ({meta.get('extraction_date', 'unknown')})\n"
 
             return [types.TextContent(type="text", text=response)]
 
@@ -3459,14 +3452,9 @@ Consider:
             detail = args.get("detail", "standard")
             output_format = args.get("format", "markdown")
 
-            # Load from pob_complete_skills.json (has complete data)
-            pob_skills_file = Path(__file__).parent.parent / 'data' / 'pob_complete_skills.json'
-
-            if not pob_skills_file.exists():
-                return [types.TextContent(type="text", text="Error: pob_complete_skills.json not found")]
-
-            with open(pob_skills_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+            # Load via the unified skill_data_loader (PoB2 → complete_models fallback chain).
+            from src.data.skill_data_loader import load_active_skills
+            data = load_active_skills()
 
             # Extract and filter spells
             all_spells = []
@@ -4430,16 +4418,14 @@ Could not extract account and character from URL.
                     text="Error: mod_id is required"
                 )]
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Search for mod by ID (case-insensitive)
             found = None
@@ -4505,16 +4491,14 @@ Could not extract account and character from URL.
             detail = args.get("detail", "standard")
             output_format = args.get("format", "markdown")
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Filter mods
             filtered_mods = []
@@ -4577,16 +4561,14 @@ Could not extract account and character from URL.
                     text="Error: stat_keyword is required"
                 )]
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Search for mods matching the stat keyword
             matching_mods = []
@@ -4655,16 +4637,14 @@ Could not extract account and character from URL.
                     text="Error: mod_base is required"
                 )]
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Find all mods matching the base name
             tier_mods = []
@@ -4735,16 +4715,14 @@ Could not extract account and character from URL.
                     text="Error: mod_ids list is required"
                 )]
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Create a lookup dictionary
             mods_by_id = {m['mod_id']: m for m in mods_data.get('mods', [])}
@@ -4867,16 +4845,14 @@ Could not extract account and character from URL.
                     text="Error: generation_type must be 'PREFIX' or 'SUFFIX'"
                 )]
 
-            # Load mods from JSON file
-            mods_file = DATA_DIR / "poe2_mods_extracted.json"
-            if not mods_file.exists():
+            # Load via unified mods_data_loader (fallback chain over candidate filenames).
+            from src.data.mods_data_loader import load_mods_data
+            mods_data = load_mods_data()
+            if not mods_data.get("mods"):
                 return [types.TextContent(
                     type="text",
-                    text="Error: Mod database not found. File poe2_mods_extracted.json is missing."
+                    text="Error: Mod database is empty or missing."
                 )]
-
-            with open(mods_file, 'r', encoding='utf-8') as f:
-                mods_data = json.load(f)
 
             # Filter mods
             available_mods = []
