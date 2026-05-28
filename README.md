@@ -277,6 +277,32 @@ The server includes a local database with:
 
 Data is loaded from `data/` directory on startup.
 
+### Refreshing support gem data from PoB2
+
+The bundled `complete_models/` snapshots can lag a patch or two and
+sometimes ship empty `stat_effects` (a known datc64 extraction gap).
+For up-to-date support gem multipliers, spirit costs, and gem-family
+filters, you can enrich the in-memory data at startup using the
+[PathOfBuildingCommunity/PathOfBuilding-PoE2](https://github.com/PathOfBuildingCommunity/PathOfBuilding-PoE2)
+Lua data, which the community typically updates within 24-48h of each
+PoE2 patch.
+
+Steps:
+
+```bash
+# 1. Clone (or git pull) the PoB2 community data repo somewhere
+git clone https://github.com/PathOfBuildingCommunity/PathOfBuilding-PoE2 /tmp/pob2
+
+# 2. Parse Lua → JSON into this repo's data/pob2/
+python scripts/pob2_to_json.py /tmp/pob2 data/pob2
+
+# 3. Restart the MCP server. The FreshDataProvider now picks up
+#    data/pob2/pob2_supports.json automatically via src/data/pob2_enricher.py.
+```
+
+If `data/pob2/pob2_supports.json` is absent, the enricher is a no-op
+and the server starts normally with whatever `complete_models/` provides.
+
 ---
 
 ## Architecture
@@ -299,7 +325,8 @@ poe2-mcp/
 │   │   └── stun_calculator.py
 │   ├── data/              # Data providers
 │   │   ├── mod_data_provider.py
-│   │   └── fresh_data_provider.py
+│   │   ├── fresh_data_provider.py
+│   │   └── pob2_enricher.py     # Optional PoB2 v0.15+ enrichment
 │   ├── optimizer/         # Optimization engines
 │   │   ├── gear_optimizer.py
 │   │   └── gem_synergy_calculator.py
