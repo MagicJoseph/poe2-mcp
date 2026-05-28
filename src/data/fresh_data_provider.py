@@ -107,6 +107,14 @@ class FreshDataProvider:
 
         self._load_all_data()
 
+        # Optional PoB2 enrichment. No-op if data/pob2/pob2_supports.json
+        # is not present (e.g. user did not run scripts/pob2_to_json.py).
+        try:
+            from src.data.pob2_enricher import enrich_with_pob2
+            enrich_with_pob2(self)
+        except Exception as _exc:
+            logger.debug(f"pob2_enricher skip: {_exc}")
+
     def _load_all_data(self):
         """Load all game data from fresh extractions."""
         logger.info("Loading fresh game data...")
