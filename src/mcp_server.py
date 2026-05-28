@@ -3385,7 +3385,7 @@ Consider:
                     effect_summary = ", ".join(key_effects)
 
                 all_supports.append({
-                    'name': support_name,
+                    'name': support_data.get('display_name') or support_id,
                     'tags': support_data.get('tags') or [],
                     'tier': support_data.get('tier', '?'),
                     'spirit_cost': spirit_cost,
